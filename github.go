@@ -15,13 +15,12 @@ type Release struct {
 	HTMLURL string `json:"html_url"`
 }
 
-func fetchLatestRelease(token string) (*Release, error) {
+func fetchLatestRelease() (*Release, error) {
 	url := fmt.Sprintf("https://api.github.com/repos/%s/releases/latest", gethRepo)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Accept", "application/vnd.github+json")
 
 	resp, err := http.DefaultClient.Do(req)

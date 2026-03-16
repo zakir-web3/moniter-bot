@@ -10,14 +10,13 @@ import (
 const versionFile = "last_version.txt"
 
 func main() {
-	githubToken := mustEnv("GITHUB_TOKEN")
 	modelsToken := mustEnv("GH_MODELS_TOKEN")
 	telegramToken := mustEnv("TELEGRAM_BOT_TOKEN")
 	chatID := mustEnv("TELEGRAM_CHAT_ID")
 
 	lastVersion := readLastVersion()
 
-	release, err := fetchLatestRelease(githubToken)
+	release, err := fetchLatestRelease()
 	if err != nil {
 		log.Fatalf("fetch release: %v", err)
 	}
