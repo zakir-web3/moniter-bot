@@ -1,12 +1,12 @@
 package main
 
-// ---- GitHub 仓库配置 ----
+// ---- GitHub repository settings ----
 
 var githubRepos = []string{
 	"ethereum/go-ethereum",
 }
 
-// ---- AI 模型配置 ----
+// ---- AI model settings ----
 
 const (
 	modelsEndpoint = "https://models.inference.ai.azure.com/chat/completions"
@@ -24,14 +24,14 @@ const (
 %s`
 )
 
-// ---- Telegram 配置 ----
+// ---- Telegram settings ----
 
 const telegramMsgLimit = 4000
 
-// ---- 版本文件 ----
+// ---- Version file ----
 
 const versionFile = "last_versions.json"
 
-// ---- 消息模板 ----
+// ---- Message template ----
 
 const messageTmpl = "%s 发布新版本 %s\n\n%s\n\n查看完整发布说明：%s"
