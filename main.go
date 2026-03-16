@@ -7,8 +7,6 @@ import (
 	"strings"
 )
 
-const versionFile = "last_version.txt"
-
 func main() {
 	modelsToken := mustEnv("GH_MODELS_TOKEN")
 	telegramToken := mustEnv("TELEGRAM_BOT_TOKEN")
@@ -66,12 +64,10 @@ func writeLastVersion(version string) error {
 }
 
 func formatMessage(r *Release, summary string) string {
-	msg := fmt.Sprintf("go-ethereum 发布新版本 %s\n\n%s\n\n查看完整发布说明：%s",
-		r.TagName, summary, r.HTMLURL)
-	// Telegram message limit is 4096 chars
-	if len([]rune(msg)) > 4000 {
+	msg := fmt.Sprintf(messageTmpl, r.TagName, summary, r.HTMLURL)
+	if len([]rune(msg)) > telegramMsgLimit {
 		runes := []rune(msg)
-		msg = string(runes[:4000]) + "..."
+		msg = string(runes[:telegramMsgLimit]) + "..."
 	}
 	return msg
 }

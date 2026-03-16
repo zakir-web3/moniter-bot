@@ -6,8 +6,6 @@ import (
 	"net/http"
 )
 
-const gethRepo = "ethereum/go-ethereum"
-
 type Release struct {
 	TagName string `json:"tag_name"`
 	Name    string `json:"name"`
@@ -16,7 +14,7 @@ type Release struct {
 }
 
 func fetchLatestRelease() (*Release, error) {
-	url := fmt.Sprintf("https://api.github.com/repos/%s/releases/latest", gethRepo)
+	url := fmt.Sprintf("https://api.github.com/repos/%s/releases/latest", githubRepo)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
