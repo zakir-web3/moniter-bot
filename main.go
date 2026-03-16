@@ -11,6 +11,7 @@ const versionFile = "last_version.txt"
 
 func main() {
 	githubToken := mustEnv("GITHUB_TOKEN")
+	modelsToken := mustEnv("GH_MODELS_TOKEN")
 	telegramToken := mustEnv("TELEGRAM_BOT_TOKEN")
 	chatID := mustEnv("TELEGRAM_CHAT_ID")
 
@@ -28,7 +29,7 @@ func main() {
 
 	fmt.Printf("new version detected: %s (was: %s)\n", release.TagName, lastVersion)
 
-	summary, err := interpretRelease(githubToken, release)
+	summary, err := interpretRelease(modelsToken, release)
 	if err != nil {
 		log.Fatalf("interpret release: %v", err)
 	}
