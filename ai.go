@@ -2,8 +2,10 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 )
 
@@ -25,7 +27,7 @@ type chatResponse struct {
 	} `json:"choices"`
 }
 
-func interpretRelease(token string, repo string, r *Release) (string, error) {
+func interpretRelease(ctx context.Context, token string, repo string, r *Release) (string, error) {
 	prompt := fmt.Sprintf(userPromptTmpl, repo, r.TagName, r.Body)
 
 	reqBody := chatRequest{
@@ -41,21 +43,22 @@ func interpretRelease(token string, repo string, r *Release) (string, error) {
 		return "", err
 	}
 
-	req, err := http.NewRequest("POST", modelsEndpoint, bytes.NewReader(body))
+	req, err := http.NewRequestWithContext(ctx, "POST", modelsEndpoint, bytes.NewReader(body))
 	if err != nil {
 		return "", err
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return "", err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("github models api returned status %d", resp.StatusCode)
+		respBody, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("github models api status %d: %s", resp.StatusCode, respBody)
 	}
 
 	var chatResp chatResponse

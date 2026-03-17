@@ -32,6 +32,9 @@ const telegramMsgLimit = 4000
 
 const versionFile = "last_versions.json"
 
-// ---- Message template ----
+// ---- Message template (HTML format for Telegram) ----
 
-const messageTmpl = "%s 发布新版本 %s\n\n%s\n\n查看完整发布说明：%s"
+const (
+	msgHeader = `<b>%s</b> 发布新版本 <b>%s</b>`
+	msgFooter = `<a href="%s">查看完整发布说明</a>`
+)

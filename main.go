@@ -1,44 +1,61 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"log"
+	"html"
+	"log/slog"
 	"os"
+	"time"
 )
 
 func main() {
-	modelsToken := mustEnv("GH_MODELS_TOKEN")
+	modelsToken := mustEnv("GH_PAT_CLASSIC_TOKEN")
 	telegramToken := mustEnv("TELEGRAM_BOT_TOKEN")
 	chatID := mustEnv("TELEGRAM_CHAT_ID")
+	githubToken := os.Getenv("GITHUB_TOKEN")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
 
 	versions := readVersions()
+	var hasError bool
 
 	for _, repo := range githubRepos {
 		lastVersion := versions[repo]
 
-		release, err := fetchLatestRelease(repo)
+		release, err := retry(ctx, "fetch-release", func(ctx context.Context) (*Release, error) {
+			return fetchLatestRelease(ctx, repo, githubToken)
+		})
 		if err != nil {
-			log.Printf("[%s] fetch release: %v", repo, err)
+			slog.Error("fetch release failed", "repo", repo, "error", err)
+			hasError = true
 			continue
 		}
 
 		if release.TagName == lastVersion {
-			fmt.Printf("[%s] no new version (current: %s)\n", repo, lastVersion)
+			slog.Info("no new version", "repo", repo, "version", lastVersion)
 			continue
 		}
 
-		fmt.Printf("[%s] new version detected: %s (was: %s)\n", repo, release.TagName, lastVersion)
+		slog.Info("new version detected", "repo", repo, "new", release.TagName, "old", lastVersion)
 
-		summary, err := interpretRelease(modelsToken, repo, release)
+		summary, err := retry(ctx, "interpret-release", func(ctx context.Context) (string, error) {
+			return interpretRelease(ctx, modelsToken, repo, release)
+		})
 		if err != nil {
-			log.Printf("[%s] interpret release: %v", repo, err)
+			slog.Error("interpret release failed", "repo", repo, "error", err)
+			hasError = true
 			continue
 		}
 
 		msg := formatMessage(repo, release, summary)
-		if err := sendTelegram(telegramToken, chatID, msg); err != nil {
-			log.Printf("[%s] send telegram: %v", repo, err)
+		if err := retryDo(ctx, "send-telegram", func(ctx context.Context) error {
+			return sendTelegram(ctx, telegramToken, chatID, msg)
+		}); err != nil {
+			slog.Error("send telegram failed", "repo", repo, "error", err)
+			hasError = true
 			continue
 		}
 
@@ -46,16 +63,23 @@ func main() {
 	}
 
 	if err := writeVersions(versions); err != nil {
-		log.Fatalf("write versions: %v", err)
+		slog.Error("write versions failed", "error", err)
+		os.Exit(1)
 	}
 
-	fmt.Println("done")
+	if hasError {
+		slog.Error("completed with errors")
+		os.Exit(1)
+	}
+
+	slog.Info("done")
 }
 
 func mustEnv(key string) string {
 	v := os.Getenv(key)
 	if v == "" {
-		log.Fatalf("env %s is required", key)
+		slog.Error("required env not set", "key", key)
+		os.Exit(1)
 	}
 	return v
 }
@@ -81,10 +105,15 @@ func writeVersions(versions map[string]string) error {
 }
 
 func formatMessage(repo string, r *Release, summary string) string {
-	msg := fmt.Sprintf(messageTmpl, repo, r.TagName, summary, r.HTMLURL)
-	if len([]rune(msg)) > telegramMsgLimit {
-		runes := []rune(msg)
-		msg = string(runes[:telegramMsgLimit]) + "..."
+	header := fmt.Sprintf(msgHeader, html.EscapeString(repo), html.EscapeString(r.TagName))
+	footer := fmt.Sprintf(msgFooter, r.HTMLURL)
+	suffix := "\n\n" + footer
+
+	escaped := html.EscapeString(summary)
+	maxLen := telegramMsgLimit - len([]rune(header)) - len([]rune(suffix)) - 5
+	runes := []rune(escaped)
+	if len(runes) > maxLen {
+		escaped = string(runes[:maxLen]) + "..."
 	}
-	return msg
+	return header + "\n\n" + escaped + suffix
 }
