@@ -4,6 +4,7 @@ package main
 
 var githubRepos = []string{
 	"ethereum/go-ethereum",
+	"bnb-chain/bsc",
 }
 
 // ---- AI model settings ----
