@@ -1,6 +1,6 @@
-# Monitor Bot
+# AI Reads
 
-A GitHub Release monitor bot that periodically checks blockchain repositories for new releases, generates AI-powered summaries, and delivers them through two channels:
+An AI-powered release interpreter that monitors open-source repositories, generates intelligent analysis, and delivers them through two channels:
 
 - **Telegram** — concise notification for quick awareness
 - **[GitHub Pages](https://zakir-web3.github.io/ai-reads/)** — in-depth technical analysis website, auto-updated on every new release
