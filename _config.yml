@@ -1,0 +1,5 @@
+remote_theme: pages-themes/cayman@v0.2.0
+title: Monitor-Bot 代码解读
+description: 区块链版本监控机器人 config.go 深度解读
+plugins:
+  - jekyll-remote-theme
