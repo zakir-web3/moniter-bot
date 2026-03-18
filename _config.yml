@@ -1,5 +1,5 @@
 remote_theme: pages-themes/cayman@v0.2.0
-title: 区块链版本深度解读
-description: monitor-bot 自动生成的区块链开源项目版本深度技术分析
+title: AI Reads
+description: AI 驱动的开源项目版本深度技术分析
 plugins:
   - jekyll-remote-theme

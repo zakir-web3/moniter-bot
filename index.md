@@ -1,11 +1,11 @@
 ---
 layout: default
-title: 区块链项目版本深度解读
+title: AI Reads - 技术版本深度解读
 ---
 
-# 区块链项目版本深度解读
+# AI Reads - 技术版本深度解读
 
-> 由 [monitor-bot](https://github.com/zakir-web3/monitor-bot) 自动生成的区块链开源项目版本深度技术分析报告
+> 由 [ai-reads](https://github.com/zakir-web3/ai-reads) 自动生成的开源项目版本深度技术分析报告
 
 ---
 
