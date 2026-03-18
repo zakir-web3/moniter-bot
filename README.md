@@ -3,7 +3,7 @@
 A GitHub Release monitor bot that periodically checks blockchain repositories for new releases, generates AI-powered summaries, and delivers them through two channels:
 
 - **Telegram** — concise notification for quick awareness
-- **[GitHub Pages](https://zakir-web3.github.io/monitor-bot/)** — in-depth technical analysis website, auto-updated on every new release
+- **[GitHub Pages](https://zakir-web3.github.io/ai-reads/)** — in-depth technical analysis website, auto-updated on every new release
 
 ## How It Works
 
@@ -19,7 +19,7 @@ New Release Detected
 2. Fetches recent releases for each monitored repository via GitHub API
 3. For each new release:
    - Calls AI to generate a **concise summary** → sends to Telegram
-   - Calls AI to generate a **deep technical analysis** → publishes to [GitHub Pages](https://zakir-web3.github.io/monitor-bot/)
+   - Calls AI to generate a **deep technical analysis** → publishes to [GitHub Pages](https://zakir-web3.github.io/ai-reads/)
 4. Commits the updated `last_versions.json`
 
 ## Monitored Repositories
@@ -43,8 +43,8 @@ Edit the `githubRepos` list in `config.go` to add or remove repositories.
 ### 1. Fork or Clone
 
 ```bash
-git clone https://github.com/zakir-web3/monitor-bot.git
-cd monitor-bot
+git clone https://github.com/zakir-web3/ai-reads.git
+cd ai-reads
 ```
 
 ### 2. Set Up Secrets
@@ -83,14 +83,14 @@ export GH_PAT_CLASSIC_TOKEN="your-token"
 export TELEGRAM_BOT_TOKEN="your-bot-token"
 export TELEGRAM_CHAT_ID="your-chat-id"
 export GITHUB_TOKEN="your-github-token"
-export GITHUB_REPOSITORY="your-user/monitor-bot"
+export GITHUB_REPOSITORY="your-user/ai-reads"
 go run .
 ```
 
 ## Project Structure
 
 ```
-monitor-bot/
+ai-reads/
 ├── config.go       # All configuration: repos, AI prompts, templates
 ├── main.go         # Entry point and orchestration
 ├── github.go       # GitHub API: fetch releases
