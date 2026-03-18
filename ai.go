@@ -27,14 +27,12 @@ type chatResponse struct {
 	} `json:"choices"`
 }
 
-func interpretRelease(ctx context.Context, token string, repo string, r *Release) (string, error) {
-	prompt := fmt.Sprintf(userPromptTmpl, repo, r.TagName, r.Body)
-
+func callAI(ctx context.Context, token, sysPrompt, userPrompt string) (string, error) {
 	reqBody := chatRequest{
 		Model: modelName,
 		Messages: []message{
-			{Role: "system", Content: systemPrompt},
-			{Role: "user", Content: prompt},
+			{Role: "system", Content: sysPrompt},
+			{Role: "user", Content: userPrompt},
 		},
 	}
 
@@ -69,4 +67,14 @@ func interpretRelease(ctx context.Context, token string, repo string, r *Release
 		return "", fmt.Errorf("no choices in response")
 	}
 	return chatResp.Choices[0].Message.Content, nil
+}
+
+func interpretRelease(ctx context.Context, token string, repo string, r *Release) (string, error) {
+	prompt := fmt.Sprintf(userPromptTmpl, repo, r.TagName, r.Body)
+	return callAI(ctx, token, systemPrompt, prompt)
+}
+
+func interpretReleaseDeep(ctx context.Context, token string, repo string, r *Release) (string, error) {
+	prompt := fmt.Sprintf(deepUserPromptTmpl, repo, r.TagName, r.Body)
+	return callAI(ctx, token, deepSystemPrompt, prompt)
 }

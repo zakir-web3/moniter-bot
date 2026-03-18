@@ -16,6 +16,7 @@ func main() {
 	telegramToken := mustEnv("TELEGRAM_BOT_TOKEN")
 	chatID := mustEnv("TELEGRAM_CHAT_ID")
 	githubToken := os.Getenv("GITHUB_TOKEN")
+	pagesRepo := os.Getenv("GITHUB_REPOSITORY")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
@@ -80,6 +81,24 @@ func main() {
 				delete(updatedTags, release.TagName)
 				hasError = true
 				continue
+			}
+
+			// Deep analysis → publish to GitHub Pages (best-effort, does not block Telegram flow)
+			if pagesRepo == "" || githubToken == "" {
+				slog.Info("skipping pages publish", "reason", "GITHUB_REPOSITORY or GITHUB_TOKEN not set")
+			} else {
+				deepSummary, err := retry(ctx, "deep-interpret", func(ctx context.Context) (string, error) {
+					return interpretReleaseDeep(ctx, modelsToken, repo, release)
+				})
+				if err != nil {
+					slog.Error("deep interpret failed", "repo", repo, "tag", release.TagName, "error", err)
+				} else if err := retryDo(ctx, "publish-pages", func(ctx context.Context) error {
+					return publishToPages(ctx, githubToken, pagesRepo, repo, release, deepSummary)
+				}); err != nil {
+					slog.Error("publish to pages failed", "repo", repo, "tag", release.TagName, "error", err)
+				} else {
+					slog.Info("published to pages", "repo", repo, "tag", release.TagName)
+				}
 			}
 		}
 
