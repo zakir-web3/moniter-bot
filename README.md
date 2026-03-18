@@ -22,7 +22,7 @@ New Release Detected
    - Calls AI to generate a **deep technical analysis** → publishes to [GitHub Pages](https://zakir-web3.github.io/ai-reads/)
 4. Commits the updated `last_versions.json`
 
-## Monitored Repositories
+## Tracked Repositories
 
 | Repository | Description |
 |------------|-------------|
@@ -104,7 +104,7 @@ ai-reads/
 
 ## Customization
 
-- **Monitored repos** — Edit the `githubRepos` list in `config.go`.
+- **Tracked repos** — Edit the `githubRepos` list in `config.go`.
 - **AI model / prompts** — Edit `modelName`, `systemPrompt`, `deepSystemPrompt` and prompt templates in `config.go`.
 - **Message format** — Modify `msgHeader` / `msgFooter` in `config.go`. Telegram messages use HTML format.
 - **Schedule** — Adjust the cron expression in `.github/workflows/monitor.yml`.

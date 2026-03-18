@@ -1,4 +1,4 @@
-name: Monitor GitHub Releases
+name: AI Reads
 
 on:
   schedule:

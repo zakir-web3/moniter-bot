@@ -17,7 +17,7 @@ func TestSendTelegram(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	msg := "<b>Test Message</b>\n\nThis is a test from <code>monitor-bot</code> at " + time.Now().Format(time.RFC3339)
+	msg := "<b>Test Message</b>\n\nThis is a test from <code>ai-reads</code> at " + time.Now().Format(time.RFC3339)
 	if err := sendTelegram(ctx, token, chatID, msg); err != nil {
 		t.Fatalf("sendTelegram failed: %v", err)
 	}
