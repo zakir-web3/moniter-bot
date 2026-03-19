@@ -1,5 +1,5 @@
 remote_theme: pages-themes/cayman@v0.2.0
 title: AI Reads
-description: AI 驱动的开源项目版本深度技术分析
+description: AI-powered in-depth technical analysis of open-source project releases
 plugins:
   - jekyll-remote-theme
