@@ -1,0 +1,33 @@
+---
+description: Rules for editing config.go — prompts, repos, and constants
+globs: config.go
+alwaysApply: false
+---
+
+# Editing config.go
+
+`config.go` is the single source of truth for all tunable parameters.
+
+## Adding a New Repo
+
+Add to the `githubRepos` slice. The format is `"owner/repo"`.
+
+## Modifying AI Prompts
+
+- `systemPrompt` + `userPromptTmpl` — concise Telegram summary (Chinese)
+- `deepSystemPromptZH` + `deepUserPromptTmplZH` — deep analysis (Chinese)
+- `deepSystemPromptEN` + `deepUserPromptTmplEN` — deep analysis (English)
+
+When modifying prompts:
+- Keep ZH and EN versions structurally aligned
+- Prompt templates use `%s` verbs via `fmt.Sprintf` — do not break the verb order
+- Test changes by running locally with a known release before pushing
+
+## Constants
+
+| Constant | Purpose |
+|----------|---------|
+| `telegramMsgLimit` | Max rune length for Telegram messages (4000) |
+| `releasesPerPage` | GitHub API per_page for releases (5) |
+| `versionFile` | Path to version state file |
+| `pagesBranch` | Target branch for GitHub Pages |

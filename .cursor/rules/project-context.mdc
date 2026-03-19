@@ -1,0 +1,53 @@
+---
+description: AI Reads project context — architecture, conventions, and workflow
+alwaysApply: true
+---
+
+# AI Reads — Project Context
+
+A Go CLI tool that monitors blockchain repo releases, generates AI-powered analysis, and delivers via Telegram + GitHub Pages.
+
+## Architecture
+
+```
+main.go      — entry point, orchestration loop
+config.go    — repos list, AI prompts, templates, constants
+github.go    — GitHub Releases API client
+ai.go        — AI model calls (concise + deep analysis, zh/en)
+telegram.go  — Telegram Bot message delivery
+pages.go     — publish Markdown to gh-pages via GitHub Contents API
+client.go    — shared HTTP client, generic retry with exponential backoff
+```
+
+## Key Design Decisions
+
+- **Zero dependencies** — stdlib only (`net/http`, `encoding/json`, `log/slog`). Do NOT introduce third-party packages without explicit approval.
+- **Structured logging** — always use `log/slog` (never `fmt.Println` or `log.Printf` for runtime logs).
+- **Context propagation** — every function that does I/O must accept `context.Context` as its first parameter.
+- **Generic retry** — use `retry[T]` / `retryDo` from `client.go` for all network calls.
+- **Fail-open per repo** — one repo's failure must not block others; track `hasError` and continue the loop.
+
+## Workflow
+
+1. Read `last_versions.json` → fetch releases → diff → for each new release:
+   - AI concise summary → Telegram
+   - AI deep analysis (zh + en) → GitHub Pages (`_posts/` on `gh-pages` branch)
+2. Write updated `last_versions.json`
+3. Exit 0 on success, 1 on any error
+
+## Build & QA
+
+```bash
+make check   # fmt → vet → lint → test (the full pre-commit pipeline)
+make lint     # golangci-lint run ./...
+make test     # go test -v -race -count=1 ./...
+```
+
+A Cursor Hook automatically runs `make check` after every `.go` file edit.
+
+## Conventions
+
+- All configuration lives in `config.go` — prompts, endpoints, constants.
+- Telegram messages use **HTML** parse mode (not Markdown).
+- GitHub Pages posts use Jekyll front matter with `layout: default`.
+- File naming for posts: `_posts/YYYY-MM-DD-{slug}-{lang}.md`.

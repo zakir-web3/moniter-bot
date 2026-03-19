@@ -1,0 +1,36 @@
+---
+description: Remind to sync rules and README after significant code changes
+alwaysApply: true
+---
+
+# Self-Maintenance
+
+After completing any of the following changes, proactively check whether `.cursor/rules/` and `README.md` need updating, and inform the user:
+
+## Triggers
+
+- Adding, removing, or renaming source files
+- Adding or removing third-party dependencies
+- Changing the architecture or data flow
+- Modifying `.golangci.yml` or `Makefile`
+- Adding new environment variables or secrets
+- Changing AI model, endpoints, or prompt structure
+- Modifying GitHub Actions workflow
+
+## What to Check
+
+| Changed | Sync target |
+|---------|-------------|
+| File added/removed/renamed | `project-context.mdc` architecture section |
+| New dependency | `project-context.mdc` zero-deps note, `go-standards.mdc` |
+| Lint config changed | `go-standards.mdc` linter list |
+| New env var / secret | `README.md` secrets table |
+| Prompt structure changed | `config-editing.mdc` prompt section |
+| Build/test commands changed | `project-context.mdc` build section, `README.md` |
+| New repo tracked | `README.md` tracked repos table |
+
+## Behavior
+
+- After finishing the code change, briefly tell the user which docs/rules are now stale
+- Offer to update them in the same session
+- Do NOT silently skip this check

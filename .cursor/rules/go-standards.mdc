@@ -1,0 +1,52 @@
+---
+description: Go coding standards for ai-reads
+globs: "**/*.go"
+alwaysApply: false
+---
+
+# Go Standards
+
+## Error Handling
+
+- Always wrap errors with context: `fmt.Errorf("fetch releases: %w", err)`
+- Never silently ignore errors except `resp.Body.Close()` and `io.Closer.Close()`
+- Use early returns to reduce nesting
+
+## HTTP Requests
+
+- Always use `http.NewRequestWithContext` (never `http.Get` / `http.Post`)
+- Always `defer resp.Body.Close()` immediately after error check
+- Read response body before returning errors for debugging
+
+```go
+// ✅ GOOD
+resp, err := httpClient.Do(req)
+if err != nil {
+    return nil, err
+}
+defer resp.Body.Close()
+
+if resp.StatusCode != http.StatusOK {
+    body, _ := io.ReadAll(resp.Body)
+    return nil, fmt.Errorf("api status %d: %s", resp.StatusCode, body)
+}
+```
+
+## Logging
+
+- Use `log/slog` with key-value pairs: `slog.Error("msg", "key", value, "error", err)`
+- Log levels: `Info` for progress, `Warn` for retries, `Error` for failures
+
+## Testing
+
+- Use table-driven tests with `t.Run` subtests
+- Use `t.Helper()` in test helpers
+- Use `httptest.NewServer` for HTTP mocking (no external test deps)
+- Race detection is always on: `go test -race`
+
+## Linting
+
+golangci-lint is configured in `.golangci.yml`. Key linters:
+`bodyclose`, `errorlint`, `gocritic`, `misspell`, `noctx`, `prealloc`
+
+Do NOT introduce code that violates these linters.
