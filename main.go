@@ -12,19 +12,18 @@ import (
 )
 
 func main() {
-	modelsToken := mustEnv("GH_PAT_CLASSIC_TOKEN")
+	githubToken := mustEnv("GITHUB_TOKEN")
 	telegramToken := mustEnv("TELEGRAM_BOT_TOKEN")
 	chatID := mustEnv("TELEGRAM_CHAT_ID")
-	githubToken := os.Getenv("GITHUB_TOKEN")
 	pagesRepo := os.Getenv("GITHUB_REPOSITORY")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
-	exitCode := run(ctx, modelsToken, telegramToken, chatID, githubToken, pagesRepo)
+	exitCode := run(ctx, githubToken, telegramToken, chatID, pagesRepo)
 	cancel()
 	os.Exit(exitCode)
 }
 
-func run(ctx context.Context, modelsToken, telegramToken, chatID, githubToken, pagesRepo string) int {
+func run(ctx context.Context, githubToken, telegramToken, chatID, pagesRepo string) int {
 	versions := readVersions()
 	var hasError bool
 
@@ -68,7 +67,7 @@ func run(ctx context.Context, modelsToken, telegramToken, chatID, githubToken, p
 			slog.Info("new release detected", "repo", repo, "tag", release.TagName, "prerelease", release.Prerelease)
 
 			summary, err := retry(ctx, "interpret-release", func(ctx context.Context) (string, error) {
-				return interpretRelease(ctx, modelsToken, repo, release)
+				return interpretRelease(ctx, githubToken, repo, release)
 			})
 			if err != nil {
 				slog.Error("interpret release failed", "repo", repo, "tag", release.TagName, "error", err)
@@ -88,12 +87,12 @@ func run(ctx context.Context, modelsToken, telegramToken, chatID, githubToken, p
 			}
 
 			// Deep analysis → publish to GitHub Pages (best-effort, does not block Telegram flow)
-			if pagesRepo == "" || githubToken == "" {
-				slog.Info("skipping pages publish", "reason", "GITHUB_REPOSITORY or GITHUB_TOKEN not set")
+			if pagesRepo == "" {
+				slog.Info("skipping pages publish", "reason", "GITHUB_REPOSITORY not set")
 			} else {
 				// Chinese version
 				deepZH, err := retry(ctx, "deep-interpret-zh", func(ctx context.Context) (string, error) {
-					return interpretReleaseDeep(ctx, modelsToken, repo, release)
+					return interpretReleaseDeep(ctx, githubToken, repo, release)
 				})
 				if err != nil {
 					slog.Error("deep interpret zh failed", "repo", repo, "tag", release.TagName, "error", err)
@@ -107,7 +106,7 @@ func run(ctx context.Context, modelsToken, telegramToken, chatID, githubToken, p
 
 				// English version
 				deepEN, err := retry(ctx, "deep-interpret-en", func(ctx context.Context) (string, error) {
-					return interpretReleaseDeepEN(ctx, modelsToken, repo, release)
+					return interpretReleaseDeepEN(ctx, githubToken, repo, release)
 				})
 				if err != nil {
 					slog.Error("deep interpret en failed", "repo", repo, "tag", release.TagName, "error", err)

@@ -40,7 +40,7 @@ Edit the `githubRepos` list in `config.go` to add or remove repositories.
 ### Prerequisites
 
 - Go 1.26 or later
-- A [GitHub Models](https://github.com/marketplace/models) API token
+- A GitHub repository with [GitHub Models](https://github.com/marketplace/models) enabled
 - A Telegram Bot (create one via [@BotFather](https://t.me/BotFather))
 - The chat ID of your target Telegram group or channel
 
@@ -57,10 +57,9 @@ Go to your forked repository's **Settings > Secrets and variables > Actions**, a
 
 | Secret | Description |
 |--------|-------------|
-| `GH_PAT_CLASSIC_TOKEN` | GitHub personal access token (classic) for Models API |
+| `GITHUB_TOKEN` | Automatically provided by GitHub Actions; used for GitHub API, Models API, and publishing to GitHub Pages |
 | `TELEGRAM_BOT_TOKEN` | Telegram Bot token obtained from @BotFather |
 | `TELEGRAM_CHAT_ID` | Target Telegram chat/group/channel ID |
-| `GITHUB_TOKEN` | Automatically provided by GitHub Actions; used for API rate limiting and publishing to GitHub Pages |
 
 > **Tip:** To find your Telegram chat ID, send a message to your bot, then visit `https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates` and look for the `chat.id` field.
 
@@ -83,10 +82,9 @@ on:
 ### 5. Run Locally (Optional)
 
 ```bash
-export GH_PAT_CLASSIC_TOKEN="your-token"
+export GITHUB_TOKEN="your-github-token"
 export TELEGRAM_BOT_TOKEN="your-bot-token"
 export TELEGRAM_CHAT_ID="your-chat-id"
-export GITHUB_TOKEN="your-github-token"
 export GITHUB_REPOSITORY="your-user/ai-reads"
 go run .
 ```
