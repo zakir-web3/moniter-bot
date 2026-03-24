@@ -69,17 +69,25 @@ func callAI(ctx context.Context, token, sysPrompt, userPrompt string) (string, e
 	return chatResp.Choices[0].Message.Content, nil
 }
 
+func truncateBody(body string) string {
+	runes := []rune(body)
+	if len(runes) <= maxBodyRunes {
+		return body
+	}
+	return string(runes[:maxBodyRunes]) + "\n\n…(truncated)"
+}
+
 func interpretRelease(ctx context.Context, token string, repo string, r *Release) (string, error) {
-	prompt := fmt.Sprintf(userPromptTmpl, repo, r.TagName, r.Body)
+	prompt := fmt.Sprintf(userPromptTmpl, repo, r.TagName, truncateBody(r.Body))
 	return callAI(ctx, token, systemPrompt, prompt)
 }
 
 func interpretReleaseDeep(ctx context.Context, token string, repo string, r *Release) (string, error) {
-	prompt := fmt.Sprintf(deepUserPromptTmplZH, repo, r.TagName, r.Body)
+	prompt := fmt.Sprintf(deepUserPromptTmplZH, repo, r.TagName, truncateBody(r.Body))
 	return callAI(ctx, token, deepSystemPromptZH, prompt)
 }
 
 func interpretReleaseDeepEN(ctx context.Context, token string, repo string, r *Release) (string, error) {
-	prompt := fmt.Sprintf(deepUserPromptTmplEN, repo, r.TagName, r.Body)
+	prompt := fmt.Sprintf(deepUserPromptTmplEN, repo, r.TagName, truncateBody(r.Body))
 	return callAI(ctx, token, deepSystemPromptEN, prompt)
 }

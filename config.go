@@ -134,6 +134,13 @@ Release content:
 %s`
 )
 
+// ---- AI input limits ----
+// gpt-4o-mini on GitHub Models allows max 8 000 input tokens.
+// Reserve ~2 000 tokens for system + user prompt templates; the
+// remainder (~6 000 tokens ≈ 12 000 mixed-language characters)
+// is available for the release body.
+const maxBodyRunes = 12000
+
 // ---- Telegram settings ----
 
 const telegramMsgLimit = 4000
